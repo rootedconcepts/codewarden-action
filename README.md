@@ -21,7 +21,7 @@ on:
 
 steps:
    - name: Codewarden Analyze
-     uses: rootedconcepts/CodewardenAction@v1
+     uses: rootedconcepts/codewarden-action@v1
      with:
      github-token: ${{ secrets.GITHUB_TOKEN }}
      jira-url : "https://myjira.com/"
