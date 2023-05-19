@@ -1,0 +1,22 @@
+name: Codewarden Analyze
+description: The official codewarden.ai GitHub action
+author: codewarden.ai
+
+branding:
+  color: 'blue'
+  icon: 'crosshair'
+
+inputs:
+  github-token:
+    description: 'GitHub token'
+    required: true
+  jira-url:
+    description: 'Jira URL'
+    required: true
+  jira-api-token:
+    description: 'Jira API token'
+    required: true
+runs:
+  using: 'node16'
+  main: 'codewarden.js'
+

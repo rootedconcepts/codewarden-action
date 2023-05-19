@@ -1,0 +1,17 @@
+{
+  "name": "codewarden-action",
+  "version": "0.0.1",
+  "description": "GitHub action for running codewarden analysis",
+  "main": "codewarden.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "codewarden.io",
+  "license": "MIT",
+  "dependencies": {
+    "@actions/core": "^1.10.0",
+    "@actions/github": "^5.1.1",
+    "axios": "^0.24.0"
+  }
+}
