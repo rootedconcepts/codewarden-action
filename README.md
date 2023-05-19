@@ -25,7 +25,7 @@ steps:
      with:
      github-token: ${{ secrets.GITHUB_TOKEN }}
      jira-url : "https://myjira.com/"
-     jira-token: ${{ secrets.JIRA_TOKEN }}
+     jira-api-token: ${{ secrets.JIRA_API_TOKEN }}
 ```
 
 ## Inputs   
