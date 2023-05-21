@@ -1,14 +1,14 @@
-# [Codewarden.ai](https://codewarden.ai) GitHub Action
+# [codewarden.ai](https://codewarden.ai) GitHub Action
 
-This action will analyze your pull request code using [Codewarden](https://codewarden.ai) against the requirements detailed in your Jira ticket
+This action will analyze your pull request code using [Code Warden](https://codewarden.ai) against the requirements detailed in your Jira ticket
 
 
 ## Getting Started
 
 In order to use this action you will require
 
-1. Jira Data Centre edition
-2. The Jira [Codewarden plugin](https://marketplace.atlassian.com/) installed from the market place into your Jira Data Centre edition
+1. Jira Data Center edition
+2. The Jira [Code Warden plugin](https://marketplace.atlassian.com/) installed from the market place into your Jira Data Centre edition
 
 
 ## Usage
@@ -20,7 +20,7 @@ on:
       - main
 
 steps:
-   - name: Codewarden Analyze
+   - name: Code Warden Analyze
      uses: rootedconcepts/codewarden-action@v1
      with:
      github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -36,7 +36,7 @@ steps:
 
 ### `jira-url`
 
-**Required** The url of your Jira instance which has the Codewarden plugin installed.
+**Required** The url of your Jira instance which has the Codew Warden plugin installed.
 
 ### `jira-api-token`
 
