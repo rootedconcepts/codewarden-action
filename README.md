@@ -19,13 +19,21 @@ on:
     branches:
       - main
 
-steps:
-   - name: Code Warden Analyze
-     uses: rootedconcepts/codewarden-action@v1
-     with:
-     github-token: ${{ secrets.GITHUB_TOKEN }}
-     jira-url : "https://myjira.com/"
-     jira-api-token: ${{ secrets.JIRA_API_TOKEN }}
+permissions:
+  contents: read
+ 
+jobs:
+  verification:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Code Warden Analyze
+        uses: rootedconcepts/codewarden-action@v1
+        with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        jira-url : "https://myjira.com/"
+        jira-api-token: ${{ secrets.JIRA_API_TOKEN }}
 ```
 
 ## Inputs   
