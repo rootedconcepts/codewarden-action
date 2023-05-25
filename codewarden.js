@@ -4,12 +4,20 @@ const github = require('@actions/github');
 
 async function run() {
   try {
+
     const githubToken = core.getInput('github-token');
     const jiraUrl = core.getInput('jira-url');
     const jiraToken = core.getInput('jira-api-token');
     const codewardenUrl = `${jiraUrl}/jira/rest/analyze/1.0/pr`; 
 
     const context = github.context;
+    const eventName = github.event_name;
+    
+    if ( eventName !== "pull_request" ) {
+      core.setFailed('Only pull requests are supported.');
+      return;
+   }
+    
     const pullRequest = context.payload.pull_request;
     const commitsUrl = pullRequest.commits_url;
     const title = pullRequest.title;
