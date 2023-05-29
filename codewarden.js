@@ -2,20 +2,19 @@ const core = require('@actions/core');
 const axios = require('axios');
 const github = require('@actions/github');
 
-async function run() {
+async function runCodeWarden() {
   try {
-
     const githubToken = core.getInput('github-token');
     const jiraUrl = core.getInput('jira-url');
     const jiraToken = core.getInput('jira-api-token');
     const codewardenUrl = `${jiraUrl}/jira/rest/analyze/1.0/pr`; 
 
     const context = github.context;
-    const eventName = github.event_name;
-    
+    const eventName = context.eventName;
+  
     if ( eventName !== "pull_request" ) {
       core.setFailed('Only pull requests are supported.');
-      return;
+      process.exit(1);
    }
     
     const pullRequest = context.payload.pull_request;
@@ -27,11 +26,11 @@ async function run() {
     // Validate the title format
     const titleRegex = /^[A-Z]{2,}-\d+/; // [A-Z]{2,}-\d+ format
     if (!titleRegex.test(title)) {
-      core.setFailed('Invalid title format. The format should be "[A-Z]{2,}-\\d+".');
-      return;
+      core.setFailed('Invalid title format. The format should be "[A-Z]{2,}-\\d+".')
+      process.exit(1);
     }
 
-
+    
     const codewardenPayload = {
       action: 'review_requested',
       api_token: githubToken,
@@ -43,7 +42,7 @@ async function run() {
       }
     }; 
 
-    const response = await axios.post(codewardenUrl, payload, {
+    const response = await axios.post(codewardenUrl, codewardenPayload, {
       headers: {
         Authorization: `Bearer ${jiraToken}`,
         'Content-Type': 'application/json'
@@ -60,5 +59,5 @@ async function run() {
   }
 }
 
-run();
+module.exports = { runCodeWarden };
 
