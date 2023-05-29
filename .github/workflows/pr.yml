@@ -8,13 +8,13 @@ on:
 
 permissions:
   contents: read
+  pull-requests: write
+
 
 jobs:
   pr-verification:
     runs-on: ubuntu-latest
-    permissions:
-      pull-requests: write
-
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
