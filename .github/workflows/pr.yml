@@ -25,5 +25,10 @@ jobs:
       - name: Install dependencies
         run: npm install
       
-      - uses: ArtiomTr/jest-coverage-report-action@v2
+      - name: Run Jest tests
+        run: |
+          npm test -- --coverage --coverageReporters json-summary
+          
+      - name: Jest Coverage Comment
+        uses: MishaKav/jest-coverage-comment@v1.0.23
       
