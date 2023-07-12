@@ -16,7 +16,7 @@ async function runCodeWarden() {
   
     if ( eventName !== "pull_request" ) {
       core.setFailed('Only pull requests are supported.');
-      process.exit(1);
+     // process.exit(1);
    }
     
     const pullRequest = context.payload.pull_request;

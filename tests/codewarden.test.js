@@ -18,6 +18,7 @@ const postConfig = {
   }
 };
 
+
 const expectUrl =  `${jiraUrl}/rest/analyze/1.0/pr`; 
 
 // Mock the required inputs
