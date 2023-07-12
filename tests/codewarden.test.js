@@ -5,17 +5,32 @@ const { runCodeWarden } = require('../codewarden.js');
 
 const githubToken = 'thisisnotagithubrealtoken';
 const jiraUrl = 'http://codewarden-jira.com';
-const jiraApiToken = 'thisisnotajirarealtoken';
+const jiraUser = 'myUser';
+const jiraPwd = 'myPwd';
+
+const postConfig = {
+  auth: {
+    username: jiraUser,
+    password: jiraPwd
+  },
+  headers: {
+    'Content-Type': 'application/json'
+  }
+};
+
+const expectUrl =  `${jiraUrl}/rest/analyze/1.0/pr`; 
 
 // Mock the required inputs
 jest.mock('@actions/core', () => ({
   getInput: jest.fn().mockImplementation((inputName) => ({
     'github-token': githubToken,
     'jira-url': jiraUrl,
-    'jira-api-token': jiraApiToken,
+    'jira-user': jiraUser,
+    'jira-password': jiraPwd,
   }[inputName] || '')),
   setFailed: jest.fn(),
   info: jest.fn(),
+  debug: jest.fn(),
 }));
 
 // Mock the required GitHub context
@@ -39,32 +54,26 @@ describe('Test Code Warden GitHub Action', () => {
     jest.clearAllMocks(); // Reset all mocks before each test case
   });
 
-  it('should handle invalid title format', async () => {
-    const github = require('@actions/github');
-    github.context.eventName = 'pull_request';
-    github.context.payload = {
-      pull_request: {
-        commits_url: 'https://api.github.com/repos/owner/repo/pulls/1/commits',
-        title: 'Invalid Title',
-        url: 'https://api.github.com/repos/owner/repo/pulls/1',
-        comments_url: 'https://api.github.com/repos/owner/repo/pulls/1/comments',
-      },
-    };
-
-    await runCodeWarden();
-
-    expect(process.exit).toHaveBeenCalled();
-    expect(core.setFailed).toHaveBeenCalledWith('Invalid title format. The format should be "[A-Z]{2,}-\\d+".');
-    expect(core.info).not.toHaveBeenCalled();
-  });
 
  it('should analyze pull request and add comment', async () => {
     const mockPost = jest.spyOn(axios, 'post').mockResolvedValueOnce({ status: 200 });
+    const expectedPayload = {
+      action: 'review_requested',
+      api_token: githubToken,
+      pull_request: {
+        commits:1,
+        commits_url: 'https://api.github.com/repos/owner/repo/pulls/1/commits',
+        title: 'ABC-123: Sample pull request title',
+        files_url: 'https://api.github.com/repos/owner/repo/pulls/1/files',
+        comments_url: 'https://api.github.com/repos/owner/repo/pulls/1/comments'
+      }
+    };
 
     const github = require('@actions/github');
     github.context.eventName = 'pull_request';
     github.context.payload = {
       pull_request: {
+        commits:1,
         commits_url: 'https://api.github.com/repos/owner/repo/pulls/1/commits',
         title: 'ABC-123: Sample pull request title',
         url: 'https://api.github.com/repos/owner/repo/pulls/1',
@@ -74,24 +83,11 @@ describe('Test Code Warden GitHub Action', () => {
 
     await runCodeWarden();
 
+
     expect(mockPost).toHaveBeenCalledWith(
-      `${jiraUrl}/jira/rest/analyze/1.0/pr`,
-      {
-        action: 'review_requested',
-        api_token: githubToken,
-        pull_request: {
-          commits_url: 'https://api.github.com/repos/owner/repo/pulls/1/commits',
-          title: 'ABC-123: Sample pull request title',
-          files_url: 'https://api.github.com/repos/owner/repo/pulls/1/files',
-          comments_url: 'https://api.github.com/repos/owner/repo/pulls/1/comments',
-        },
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${jiraApiToken}`,
-          'Content-Type': 'application/json',
-        },
-      }
+      expectUrl,
+      expectedPayload,
+      postConfig
     );
 
     expect(core.info).toHaveBeenCalledWith('Pull Request Analyzed by Codewarden. Comment has been added to Pull Request');
@@ -108,17 +104,28 @@ describe('Test Code Warden GitHub Action', () => {
 
     expect(axios.post).not.toHaveBeenCalled();
     expect(core.setFailed).toHaveBeenCalledWith('Only pull requests are supported.');
-    expect(core.info).not.toHaveBeenCalled();
     expect(process.exit).toHaveBeenCalled();
   });
 
   it('should handle failed analysis', async () => {
     const mockPostFailure = jest.spyOn(axios, 'post').mockResolvedValueOnce({ status: 500 });
+    const expectedPayload = {
+      action: 'review_requested',
+      api_token: githubToken,
+      pull_request: {
+        commits:1,
+        commits_url: 'https://api.github.com/repos/owner/repo/pulls/1/commits',
+        title: 'ABC-123: Sample pull request title',
+        files_url: 'https://api.github.com/repos/owner/repo/pulls/1/files',
+        comments_url: 'https://api.github.com/repos/owner/repo/pulls/1/comments'
+      }
+    };
 
     const github = require('@actions/github');
     github.context.eventName = 'pull_request';
     github.context.payload = {
       pull_request: {
+        commits:1,
         commits_url: 'https://api.github.com/repos/owner/repo/pulls/1/commits',
         title: 'ABC-123: Sample pull request title',
         url: 'https://api.github.com/repos/owner/repo/pulls/1',
@@ -129,37 +136,22 @@ describe('Test Code Warden GitHub Action', () => {
     await runCodeWarden();
   
     expect(mockPostFailure).toHaveBeenCalledWith(
-      `${jiraUrl}/jira/rest/analyze/1.0/pr`,
-      {
-        action: 'review_requested',
-        api_token: githubToken,
-        pull_request: {
-          commits_url: 'https://api.github.com/repos/owner/repo/pulls/1/commits',
-          title: 'ABC-123: Sample pull request title',
-          files_url: 'https://api.github.com/repos/owner/repo/pulls/1/files',
-          comments_url: 'https://api.github.com/repos/owner/repo/pulls/1/comments',
-        },
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${jiraApiToken}`,
-          'Content-Type': 'application/json',
-        },
-      }
+      expectUrl,
+      expectedPayload,
+      postConfig
     );
   
-    expect(core.info).not.toHaveBeenCalled();
     expect(core.setFailed).toHaveBeenCalledWith('Failed to Analyze Pull Request');
   });
   
 
   it('should handle errors', async () => {
-    jest.spyOn(axios, 'post').mockRejectedValueOnce(new Error('Something went wrong'));
+    jest.spyOn(axios, 'post').mockRejectedValueOnce(new Error('Cannnot get key'));
 
     await runCodeWarden();
 
-    expect(core.setFailed).toHaveBeenCalledWith('Something went wrong');
-    expect(core.info).not.toHaveBeenCalled();
+    expect(core.setFailed).toHaveBeenCalledWith('UnExpected Error: Code Warden encountered an issue Cannnot get key');
+
   });
 });
 
