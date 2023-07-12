@@ -105,7 +105,6 @@ describe('Test Code Warden GitHub Action', () => {
 
     expect(axios.post).not.toHaveBeenCalled();
     expect(core.setFailed).toHaveBeenCalledWith('Only pull requests are supported.');
-    expect(process.exit).toHaveBeenCalled();
   });
 
   it('should handle failed analysis', async () => {

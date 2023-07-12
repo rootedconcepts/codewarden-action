@@ -25,9 +25,5 @@ jobs:
       - name: Install dependencies
         run: npm install
       
-      - name: Run Jest tests
-        run: |
-          npm test -- --coverage
-
-
+      - uses: ArtiomTr/jest-coverage-report-action@v2
       
