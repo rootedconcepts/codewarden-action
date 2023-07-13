@@ -10,7 +10,63 @@ on:
       - main
 
 jobs:
+  version-verification:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Get Releases
+        id: get-releases
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const response = await github.rest.repos.listReleases({
+              owner: context.repo.owner,
+              repo: context.repo.repo
+            });
+            const releases = response.data.filter(release => !release.draft && !release.prerelease);
+            return releases;
+      
+      - name: Get Latest Release Version
+        id: get-latest-release
+        run: |
+            if [[ -z "${{ steps.get-releases.outputs.result }}" ]]; then
+              latestReleasedVersion="0.0.1"
+            else
+              releases=$(echo "${{ steps.get-releases.outputs.result }}" | jq 'sort_by(.created_at) | reverse')
+              latestTag=$(echo "$releases" | jq -r '.[0].tag_name')
+              if [[ $latestTag =~ v([0-9]+)\.([0-9]+)\.([0-9]+)\. ]]; then
+                major="${BASH_REMATCH[1]}"
+                minor="${BASH_REMATCH[2]}"
+                patch="${BASH_REMATCH[3]}"
+                latestReleasedVersion="${major}.${minor}.${patch}"
+              else
+                latestReleasedVersion="0.0.1"
+              fi
+            fi
+            echo "latestReleasedVersion=${latestReleasedVersion}"
+            echo "latestReleasedVersion=$latestReleasedVersion" >> $GITHUB_OUTPUT
+    
+
+      - name: Read version from package.json
+        id: read-package-version
+        run: |
+              VERSION=$(node -p "require('./package.json').version")
+              echo "packageVersion=$VERSION"
+              echo "packageVersion=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Compare Package version to Release Version
+        run: |
+          packageVersion="${{ steps.read-package-version.outputs.packageVersion }}"
+          releaseVersion="${{ steps.get-latest-release.outputs.latestReleasedVersion }}"
+          if [ "$releaseVersion" == "$packageVersion" ]; then
+            echo "Release version $releaseVersion already exists. Please update the version in your package.json as it is currently $packageVersion."
+            exit 1
+          fi
+
   pr-verification:
+    needs: version-verification
     runs-on: ubuntu-latest
     
     steps:
