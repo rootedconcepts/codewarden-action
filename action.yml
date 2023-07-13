@@ -13,9 +13,13 @@ inputs:
   jira-url:
     description: 'Jira URL'
     required: true
-  jira-api-token:
-    description: 'Jira API token'
+  jira-user:
+    description: 'Jira username'
     required: true
+  jira-password:
+    description: 'Jira password'
+    required: true
+
 runs:
   using: 'node16'
   main: 'codewarden.js'

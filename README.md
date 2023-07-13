@@ -14,6 +14,9 @@ In order to use this action you will require
 ## Usage
 
 ```yaml
+
+name: Code Warden In Action
+
 on:
   pull_request:
     branches:
@@ -21,19 +24,23 @@ on:
 
 permissions:
   contents: read
+  pull-requests: write
  
 jobs:
-  verification:
+  codewarden-test:
     runs-on: ubuntu-latest
-    permissions:
-      pull-requests: write
+   
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
       - name: Code Warden Analyze
         uses: rootedconcepts/codewarden-action@v1
         with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        jira-url : "https://myjira.com/"
-        jira-api-token: ${{ secrets.JIRA_API_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          jira-url : "https://myjira.com"
+          jira-user: ${{ secrets.JIRA_USER }}
+          jira-password: ${{ secrets.JIRA_PWD }}
 ```
 
 ## Inputs   
@@ -46,6 +53,10 @@ jobs:
 
 **Required** The url of your Jira instance which has the Codew Warden plugin installed.
 
-### `jira-api-token`
+### `jira-user`
 
-**Required** The token to access the Jira API.```
+**Required** The user name for to logon to the Jira instance.```
+
+### `jira-password`
+
+**Required** The password for to user to logon to the Jira instance.```
