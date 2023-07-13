@@ -32,7 +32,7 @@ jobs:
         id: get-latest-release
         run: |
             if [[ -z "${{ steps.get-releases.outputs.result }}" ]]; then
-              latestReleasedVersion="0.0.1"
+              latestReleasedVersion="0.0.0"
             else
               releases=$(echo "${{ steps.get-releases.outputs.result }}" | jq 'sort_by(.created_at) | reverse')
               latestTag=$(echo "$releases" | jq -r '.[0].tag_name')
