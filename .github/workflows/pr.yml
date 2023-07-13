@@ -42,7 +42,7 @@ jobs:
                 patch="${BASH_REMATCH[3]}"
                 latestReleasedVersion="${major}.${minor}.${patch}"
               else
-                latestReleasedVersion="0.0.1"
+                latestReleasedVersion="0.0.0"
               fi
             fi
             echo "latestReleasedVersion=${latestReleasedVersion}"
