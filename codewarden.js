@@ -11,65 +11,72 @@ async function runCodeWarden() {
     const jiraPwd = core.getInput('jira-password');
     const codewardenUrl = `${jiraUrl}/rest/analyze/1.0/pr`;
 
-    const context = github.context;
-    const eventName = context.eventName;
+    const { context } = github;
+    const { eventName, payload } = context;
 
     if (eventName !== "pull_request") {
       core.setFailed('Only pull requests are supported.');
-
+      return;
     }
-    else {
-      const pullRequest = context.payload.pull_request;
-      const commitsUrl = pullRequest.commits_url;
-      const title = pullRequest.title;
-      const filesUrl = pullRequest.url + '/files';
-      const commentsUrl = pullRequest.comments_url;
-      const numCommits = pullRequest.commits;
 
-      core.debug('commitsUrl:' + commitsUrl);
-      core.debug('title:' + title);
-      core.debug('filesUrl:' + filesUrl);
-      core.debug('commentsUrl:' + filesUrl);
+    const { pull_request: pullRequest } = payload;
 
-      const codewardenPayload = {
-        action: 'review_requested',
-        api_token: githubToken,
-        pull_request: {
-          commits: numCommits,
-          commits_url: commitsUrl,
-          title: title,
-          files_url: filesUrl,
-          comments_url: commentsUrl
-        }
-      };
+    const { commits_url: commitsUrl, title, url: pullRequestUrl, comments_url: commentsUrl, commits: numCommits } = pullRequest;
 
-      core.debug('codewardenPayload:' + JSON.stringify(codewardenPayload));
-
-      const config = {
-        auth: {
-          username: jiraUser,
-          password: jiraPwd
-        },
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      };
-
-      core.info('Calling Code Warden Endpoint: ' + codewardenUrl);
-      const response = await axios.post(codewardenUrl, codewardenPayload, config);
-
-
-      if (response.status === 200) {
-        core.info('Pull Request Analyzed by Codewarden. Comment has been added to Pull Request');
-      } else {
-        core.setFailed('Failed to Analyze Pull Request');
+    const codewardenPayload = {
+      action: 'review_requested',
+      api_token: githubToken,
+      pull_request: {
+        commits: numCommits,
+        commits_url: commitsUrl,
+        title: title,
+        files_url: pullRequestUrl + "/files",
+        comments_url: commentsUrl
       }
+    };
 
-    }
+    core.debug('codewardenPayload:' + JSON.stringify(codewardenPayload));
+    const config = {
+      auth: {
+        username: jiraUser,
+        password: jiraPwd
+      },
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    };
+
+    core.info('Calling Code Warden Endpoint: ' + codewardenUrl);
+    const response = await axios.post(codewardenUrl, codewardenPayload, config);
+    handleResponse(response);
 
 
   } catch (error) {
     core.setFailed('UnExpected Error: Code Warden encountered an issue ' + error.message);
+  }
+}
+
+function handleResponse(response) {
+  const responseBody = response.data;
+  switch (response.status) {
+    case 200:
+      core.info('Pull Request Analyzed by Code Warden. Comment has been added to Pull Request');
+      break;
+    case 400:
+    case 404:
+    case 500:
+      let codeWardenErrorMessage = "UnExpected Error: Code Warden encountered an issue"
+      if (responseBody) {
+        responseErrorCode = responseBody.errorCode
+        responseError = responseBody.errorMessage
+        if (responseErrorCode) {
+          codeWardenErrorMessage = "Code Warden encountered Error Code: " + responseErrorCode + ", Error Message: " + responseError
+        }
+      }
+      core.setFailed(codeWardenErrorMessage);
+      break;
+    default:
+      core.setFailed("UnExpected Error: Failed to Analyze Pull Request");
   }
 }
 
