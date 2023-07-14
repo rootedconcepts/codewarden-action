@@ -1,0 +1,72 @@
+name: Code Warden Action CI
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  determine-build-number:
+    runs-on: ubuntu-latest
+    outputs:
+        buildNumber: ${{ steps.set-build-number.outputs.buildNumber }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set the build number
+        id:  set-build-number
+        run: |
+          git fetch --prune --tags
+          latestTag=$(git for-each-ref --sort=-creatordate --format '%(refname:short)' refs/tags --count=1)
+          packageVersion=$(node -p "require('./package.json').version")
+          
+          if [[ -z $latestTag ]]; then
+            echo "buildNumber=1" >> $GITHUB_OUTPUT
+          else
+            if [[ $latestTag == *$packageVersion* ]]; then
+              newBuildNumber=$(echo "$latestTag" | awk -F '.' '{print $NF + 1}') 
+              echo "buildNumber=$newBuildNumber" >> $GITHUB_OUTPUT
+            else
+              echo "buildNumber=1" >> $GITHUB_OUTPUT
+            fi
+            
+          
+          fi
+  build-and-tag:
+    needs: determine-build-number
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build
+        run: npm test -- --coverage
+
+      - name: Upload Jest coverage report
+        uses: actions/upload-artifact@v3
+        with:
+          name: jest-report
+          path: coverage/lcov-report/*
+      
+      - name: Create tag
+        run: |
+            tagName="v$(node -p "require('./package.json').version").${{ needs.determine-build-number.outputs.buildNumber }}"
+            git tag $tagName
+            git push origin $tagName
+
+  
+
+      
+
+
