@@ -52,7 +52,7 @@ async function runCodeWarden() {
 
 
   } catch (error) {
-    core.setFailed('UnExpected Error: Code Warden encountered an issue ' + error.message);
+    core.setFailed('Unexpected Error: Code Warden encountered an issue ' + error.message);
   }
 }
 
@@ -71,8 +71,8 @@ function handleResponse(response) {
   (statuses[status] || defaultAction)();
 }
 
-function handleError(responseBody, contextError) {
-  let codeWardenErrorMessage = "Unexpected Error: Code Warden encountered an issue."
+function handleError(responseBody, contextError = error.message) {
+  let codeWardenErrorMessage = "Unexpected Error: Code Warden encountered an issue"
 
   if (responseBody) {
     responseErrorCode = responseBody.errorCode;
@@ -81,8 +81,8 @@ function handleError(responseBody, contextError) {
     if (responseErrorCode) {
       codeWardenErrorMessage = `Code Warden encountered Error Code: ${responseErrorCode} - Error Message: ${responseError} \n ${contextError}`
     }
-    return core.setFailed(codeWardenErrorMessage);
   }
+  return core.setFailed(codeWardenErrorMessage);
 }
 
 module.exports = { runCodeWarden };

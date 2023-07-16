@@ -181,7 +181,7 @@ describe('Test Code Warden GitHub Action', () => {
       postConfig
     );
     expect(core.info).toHaveBeenCalledWith('Code Warden workflow started'); 
-    expect(core.setFailed).toHaveBeenCalledWith('Code Warden encountered Error Code: 1003, \n Error Message: Internal Error has occurred. \n Internal Server Error: Something went wrong on our side.');
+    expect(core.setFailed).toHaveBeenCalledWith('Code Warden encountered Error Code: 1003 - Error Message: Internal Error has occurred \n Internal Server Error: Something went wrong on our side');
   });
 
   it('should handle failed analysis status 400 with error code', async () => {
@@ -218,7 +218,7 @@ describe('Test Code Warden GitHub Action', () => {
       postConfig
     );
     expect(core.info).toHaveBeenCalledWith('Code Warden workflow started'); 
-    expect(core.setFailed).toHaveBeenCalledWith('Code Warden encountered Error Code: 1001, \n Error Message: Bad Request. \n Bad Request: Please check all required fields.');
+    expect(core.setFailed).toHaveBeenCalledWith('Code Warden encountered Error Code: 1001 - Error Message: Bad Request \n Bad Request: Please check all required fields');
   });
 
 
@@ -303,7 +303,7 @@ describe('Test Code Warden GitHub Action', () => {
 
     await runCodeWarden();
     expect(core.info).toHaveBeenCalledWith('Code Warden workflow started'); 
-    expect(core.setFailed).toHaveBeenCalledWith('UnExpected Error: Code Warden encountered an issue Cannnot get key');
+    expect(core.setFailed).toHaveBeenCalledWith('Unexpected Error: Code Warden encountered an issue Cannnot get key');
 
   });
 });
