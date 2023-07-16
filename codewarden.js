@@ -60,13 +60,13 @@ function handleResponse(response) {
   const { status, data: responseBody } = response;
 
   const statuses = {
-    200: () => core.info('Pull Request analyzed. Comment has been added to Pull Request.'),
-    400: () => handleError(responseBody, contextError = 'Bad Request: Please check all required fields.'),
-    404: () => handleError(responseBody, contextError = 'Not Found: Requested resource could not be found.'),
-    500: () => handleError(responseBody, contextError = 'Internal Server Error: Something went wrong on our side.')
+    200: () => core.info('Pull Request analyzed. Comment has been added to Pull Request'),
+    400: () => handleError(responseBody, contextError = 'Bad Request: Please check all required fields'),
+    404: () => handleError(responseBody, contextError = 'Not Found: Requested resource could not be found'),
+    500: () => handleError(responseBody, contextError = 'Internal Server Error: Something went wrong on our side')
   };
 
-  const defaultAction = () => core.setFailed('Unexpected Error: Failed to Analyze Pull Request.');
+  const defaultAction = () => core.setFailed('Unexpected Error: Failed to Analyze Pull Request');
 
   (statuses[status] || defaultAction)();
 }
@@ -79,7 +79,7 @@ function handleError(responseBody, contextError) {
     responseError = responseBody.errorMessage;
 
     if (responseErrorCode) {
-      codeWardenErrorMessage = `Code Warden encountered Error Code: ${responseErrorCode}. \n Error Message: ${responseError}. \n ${contextError}.`
+      codeWardenErrorMessage = `Code Warden encountered Error Code: ${responseErrorCode} - Error Message: ${responseError} \n ${contextError}`
     }
     return core.setFailed(codeWardenErrorMessage);
   }

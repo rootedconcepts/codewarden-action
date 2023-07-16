@@ -110,7 +110,7 @@ describe('Test Code Warden GitHub Action', () => {
     expect(core.setFailed).toHaveBeenCalledWith('Only pull requests are supported.');
   });
 
-  it('should handle failed analysis status eroor with no error code', async () => {
+  it('should handle failed analysis status error with no error code', async () => {
     const mockPostFailure = jest.spyOn(axios, 'post').mockResolvedValueOnce({ status: 500 });
     const expectedPayload = {
       action: 'review_requested',
@@ -144,7 +144,7 @@ describe('Test Code Warden GitHub Action', () => {
       postConfig
     );
     expect(core.info).toHaveBeenCalledWith('Code Warden workflow started'); 
-    expect(core.setFailed).toHaveBeenCalledWith('UnExpected Error: Code Warden encountered an issue');
+    expect(core.setFailed).toHaveBeenCalledWith('Unexpected Error: Code Warden encountered an issue');
   });
   
   it('should handle failed analysis status 500 with error code', async () => {
@@ -181,7 +181,7 @@ describe('Test Code Warden GitHub Action', () => {
       postConfig
     );
     expect(core.info).toHaveBeenCalledWith('Code Warden workflow started'); 
-    expect(core.setFailed).toHaveBeenCalledWith('Code Warden encountered Error Code: 1003, Error Message: Internal Error has occurred');
+    expect(core.setFailed).toHaveBeenCalledWith('Code Warden encountered Error Code: 1003, \n Error Message: Internal Error has occurred. \n Internal Server Error: Something went wrong on our side.');
   });
 
   it('should handle failed analysis status 400 with error code', async () => {
@@ -218,12 +218,12 @@ describe('Test Code Warden GitHub Action', () => {
       postConfig
     );
     expect(core.info).toHaveBeenCalledWith('Code Warden workflow started'); 
-    expect(core.setFailed).toHaveBeenCalledWith('Code Warden encountered Error Code: 1001, Error Message: Bad Request');
+    expect(core.setFailed).toHaveBeenCalledWith('Code Warden encountered Error Code: 1001, \n Error Message: Bad Request. \n Bad Request: Please check all required fields.');
   });
 
 
   it('should handle failed analysis status 404 with error code', async () => {
-    const mockPostFailure = jest.spyOn(axios, 'post').mockResolvedValueOnce({ status: 400 , data: {errorCode: 1004, errorMessage: 'Not Found'} });
+    const mockPostFailure = jest.spyOn(axios, 'post').mockResolvedValueOnce({ status: 404 , data: {errorCode: 1004, errorMessage: 'Not Found'} });
     const expectedPayload = {
       action: 'review_requested',
       api_token: githubToken,
@@ -256,7 +256,7 @@ describe('Test Code Warden GitHub Action', () => {
       postConfig
     );
     expect(core.info).toHaveBeenCalledWith('Code Warden workflow started'); 
-    expect(core.setFailed).toHaveBeenCalledWith('Code Warden encountered Error Code: 1004, Error Message: Not Found');
+    expect(core.setFailed).toHaveBeenCalledWith('Code Warden encountered Error Code: 1004 - Error Message: Not Found \n Not Found: Requested resource could not be found');
   });
 
   it('should catch unhandled response status', async () => {
@@ -293,7 +293,7 @@ describe('Test Code Warden GitHub Action', () => {
       postConfig
     );
     expect(core.info).toHaveBeenCalledWith('Code Warden workflow started'); 
-    expect(core.setFailed).toHaveBeenCalledWith('UnExpected Error: Failed to Analyze Pull Request');
+    expect(core.setFailed).toHaveBeenCalledWith('Unexpected Error: Failed to Analyze Pull Request');
   });
 
 
