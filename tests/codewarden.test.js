@@ -90,10 +90,10 @@ describe('Test Code Warden GitHub Action', () => {
       expectedPayload,
       postConfig
     );
-
-    expect(core.info).toHaveBeenCalledWith('Code Warden workflow started'); 
-    expect(core.info).toHaveBeenCalledWith('Calling Code Warden Endpoint: http://codewarden-jira.com/rest/analyze/1.0/pr'); 
-    expect(core.info).toHaveBeenCalledWith('Pull Request Analyzed by Code Warden. Comment has been added to Pull Request');
+    
+    expect(core.info).toHaveBeenNthCalledWith(1, 'Code Warden workflow started');
+    expect(core.info).toHaveBeenNthCalledWith(2, 'Calling Code Warden Endpoint: http://codewarden-jira.com/rest/analyze/1.0/pr');
+    expect(core.info).toHaveBeenNthCalledWith(3, 'Pull Request analyzed. Comment has been added to Pull Request');
     expect(core.setFailed).not.toHaveBeenCalled();
     expect(process.exit).not.toHaveBeenCalled();
   });
@@ -144,7 +144,7 @@ describe('Test Code Warden GitHub Action', () => {
       postConfig
     );
     expect(core.info).toHaveBeenCalledWith('Code Warden workflow started'); 
-    expect(core.setFailed).toHaveBeenCalledWith('Unexpected Error: Code Warden encountered an issue');
+    expect(core.setFailed).toHaveBeenCalledWith('Unexpected Error: Code Warden encountered an issue \n Internal Server Error: Something went wrong on our side');
   });
   
   it('should handle failed analysis status 500 with error code', async () => {
@@ -303,7 +303,7 @@ describe('Test Code Warden GitHub Action', () => {
 
     await runCodeWarden();
     expect(core.info).toHaveBeenCalledWith('Code Warden workflow started'); 
-    expect(core.setFailed).toHaveBeenCalledWith('Unexpected Error: Code Warden encountered an issue Cannnot get key');
+    expect(core.setFailed).toHaveBeenCalledWith('Unexpected Error: Code Warden encountered an issue \n Cannnot get key');
 
   });
 });
