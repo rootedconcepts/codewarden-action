@@ -71,7 +71,7 @@ function handleResponse(response) {
   (statuses[status] || defaultAction)();
 }
 
-function handleError(responseBody, contextError = error.message) {
+function handleError(responseBody = null, contextError = error.message) {
   let codeWardenErrorMessage = "Unexpected Error: Code Warden encountered an issue"
 
   if (responseBody) {
