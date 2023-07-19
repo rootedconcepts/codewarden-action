@@ -52,32 +52,41 @@ async function runCodeWarden() {
 
 
   } catch (error) {
-    core.setFailed('UnExpected Error: Code Warden encountered an issue ' + error.message);
+    handleError(null, error.message);
   }
 }
 
 function handleResponse(response) {
-  const responseBody = response.data;
-  switch (response.status) {
-    case 200:
-      core.info('Pull Request Analyzed by Code Warden. Comment has been added to Pull Request');
-      break;
-    case 400:
-    case 404:
-    case 500:
-      let codeWardenErrorMessage = "UnExpected Error: Code Warden encountered an issue"
-      if (responseBody) {
-        responseErrorCode = responseBody.errorCode
-        responseError = responseBody.errorMessage
-        if (responseErrorCode) {
-          codeWardenErrorMessage = "Code Warden encountered Error Code: " + responseErrorCode + ", Error Message: " + responseError
-        }
-      }
-      core.setFailed(codeWardenErrorMessage);
-      break;
-    default:
-      core.setFailed("UnExpected Error: Failed to Analyze Pull Request");
+  const { status, data: responseBody } = response;
+
+  const statuses = {
+    200: () => core.info('Pull Request analyzed. Comment has been added to Pull Request'),
+    400: () => handleError(responseBody, contextError = 'Bad Request: Please check all required fields'),
+    404: () => handleError(responseBody, contextError = 'Not Found: Requested resource could not be found'),
+    500: () => handleError(responseBody, contextError = 'Internal Server Error: Something went wrong on our side')
+  };
+
+  const defaultAction = () => core.setFailed('Unexpected Error: Failed to Analyze Pull Request');
+
+  (statuses[status] || defaultAction)();
+}
+
+function handleError(responseBody = null, contextError = null) {
+  let codeWardenErrorMessage = '';
+  if (contextError != null) {
+    codeWardenErrorMessage = `Unexpected Error: Code Warden encountered an issue \n ${contextError}`;
   }
+  
+
+  if (responseBody) {
+    responseErrorCode = responseBody.errorCode;
+    responseError = responseBody.errorMessage;
+
+    if (responseErrorCode) {
+      codeWardenErrorMessage = `Code Warden encountered Error Code: ${responseErrorCode} - Error Message: ${responseError} \n ${contextError}`
+    }
+  }
+  return core.setFailed(codeWardenErrorMessage);
 }
 
 module.exports = { runCodeWarden };
