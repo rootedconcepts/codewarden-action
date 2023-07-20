@@ -1,4 +1,4 @@
-[![Code Waarden](./images/logo.png)](www.codewarden.io)
+[![Code Waarden](./images/logo.png)](https://codewarden.ai)
 
 
 # [codewarden.ai](https://codewarden.ai) GitHub Action
