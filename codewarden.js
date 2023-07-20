@@ -60,7 +60,7 @@ function handleResponse(response) {
   const { status, data: responseBody } = response;
 
   const statuses = {
-    200: () => core.info('Pull Request analyzed. Comment has been added to Pull Request'),
+    200: () => handleSuccess(responseBody),
     400: () => handleError(responseBody, contextError = 'Bad Request: Please check all required fields'),
     404: () => handleError(responseBody, contextError = 'Not Found: Requested resource could not be found'),
     500: () => handleError(responseBody, contextError = 'Internal Server Error: Something went wrong on our side')
@@ -69,6 +69,16 @@ function handleResponse(response) {
   const defaultAction = () => core.setFailed('Unexpected Error: Failed to Analyze Pull Request');
 
   (statuses[status] || defaultAction)();
+}
+
+function handleSuccess(responseBody) {
+  let codeWardenMessage = responseBody.message;
+  let checkForNoAnalysis = "Cannot perform Analysis -"
+  if (codeWardenMessage.includes(checkForNoAnalysis)) {
+    return core.warning(codeWardenMessage);
+  }
+  return core.info(codeWardenMessage);
+
 }
 
 function handleError(responseBody = null, contextError = null) {

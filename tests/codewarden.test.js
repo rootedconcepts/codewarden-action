@@ -31,6 +31,7 @@ jest.mock('@actions/core', () => ({
   }[inputName] || '')),
   setFailed: jest.fn(),
   info: jest.fn(),
+  warning: jest.fn(),
   debug: jest.fn(),
 }));
 
@@ -57,7 +58,7 @@ describe('Test Code Warden GitHub Action', () => {
 
 
  it('should analyze pull request and add comment', async () => {
-    const mockPost = jest.spyOn(axios, 'post').mockResolvedValueOnce({ status: 200 });
+    const mockPost = jest.spyOn(axios, 'post').mockResolvedValueOnce({ status: 200, data: {message: 'Pull Request Analyzed by Code Warden. Comment has been added to this Pull Request'} });
     const expectedPayload = {
       action: 'review_requested',
       api_token: githubToken,
@@ -93,7 +94,50 @@ describe('Test Code Warden GitHub Action', () => {
     
     expect(core.info).toHaveBeenNthCalledWith(1, 'Code Warden workflow started');
     expect(core.info).toHaveBeenNthCalledWith(2, 'Calling Code Warden Endpoint: http://codewarden-jira.com/rest/analyze/1.0/pr');
-    expect(core.info).toHaveBeenNthCalledWith(3, 'Pull Request analyzed. Comment has been added to Pull Request');
+    expect(core.info).toHaveBeenNthCalledWith(3, 'Pull Request Analyzed by Code Warden. Comment has been added to this Pull Request');
+    expect(core.warning).not.toHaveBeenCalled();
+    expect(core.setFailed).not.toHaveBeenCalled();
+    expect(process.exit).not.toHaveBeenCalled();
+  });
+
+  it('should analyze pull request found no jira key', async () => {
+    const mockPost = jest.spyOn(axios, 'post').mockResolvedValueOnce({ status: 200, data: {message: 'Cannot perform Analysis - No work item was found in the pull_request for the analysis'} });
+    const expectedPayload = {
+      action: 'review_requested',
+      api_token: githubToken,
+      pull_request: {
+        commits:1,
+        commits_url: 'https://api.github.com/repos/owner/repo/pulls/1/commits',
+        title: 'ABC-123: Sample pull request title',
+        files_url: 'https://api.github.com/repos/owner/repo/pulls/1/files',
+        comments_url: 'https://api.github.com/repos/owner/repo/pulls/1/comments'
+      }
+    };
+
+    const github = require('@actions/github');
+    github.context.eventName = 'pull_request';
+    github.context.payload = {
+      pull_request: {
+        commits:1,
+        commits_url: 'https://api.github.com/repos/owner/repo/pulls/1/commits',
+        title: 'ABC-123: Sample pull request title',
+        url: 'https://api.github.com/repos/owner/repo/pulls/1',
+        comments_url: 'https://api.github.com/repos/owner/repo/pulls/1/comments',
+      },
+    };
+
+    await runCodeWarden();
+
+
+    expect(mockPost).toHaveBeenCalledWith(
+      expectUrl,
+      expectedPayload,
+      postConfig
+    );
+    
+    expect(core.info).toHaveBeenNthCalledWith(1, 'Code Warden workflow started');
+    expect(core.info).toHaveBeenNthCalledWith(2, 'Calling Code Warden Endpoint: http://codewarden-jira.com/rest/analyze/1.0/pr');
+    expect(core.warning).toHaveBeenNthCalledWith(1, 'Cannot perform Analysis - No work item was found in the pull_request for the analysis');
     expect(core.setFailed).not.toHaveBeenCalled();
     expect(process.exit).not.toHaveBeenCalled();
   });

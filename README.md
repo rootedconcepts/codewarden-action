@@ -1,3 +1,6 @@
+[![Code Waarden](./images/logo.png)](www.codewarden.io)
+
+
 # [codewarden.ai](https://codewarden.ai) GitHub Action
 
 This action will analyze your pull request code using [Code Warden](https://codewarden.ai) against the requirements detailed in your Jira ticket
