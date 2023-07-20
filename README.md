@@ -5,7 +5,7 @@
 
 This action will analyze your pull request code using [Code Warden](https://codewarden.ai) against the requirements detailed in your Jira ticket
 
-
+---
 ## Getting Started
 
 In order to use this action you will require
@@ -13,7 +13,7 @@ In order to use this action you will require
 1. Jira Data Center edition
 2. The Jira [Code Warden plugin](https://marketplace.atlassian.com/) installed from the market place into your Jira Data Center edition
 
-
+---
 ## Usage
 
 ```yaml
@@ -45,7 +45,7 @@ jobs:
           jira-user: ${{ secrets.JIRA_USER }}
           jira-password: ${{ secrets.JIRA_PWD }}
 ```
-
+---
 ## Inputs   
 
 ### `github-token`
@@ -58,8 +58,8 @@ jobs:
 
 ### `jira-user`
 
-**Required** The user name for to logon to the Jira instance.```
+**Required** The user name for to logon to the Jira instance.
 
 ### `jira-password`
 
-**Required** The password for to user to logon to the Jira instance.```
+**Required** The password for to user to logon to the Jira instance.
