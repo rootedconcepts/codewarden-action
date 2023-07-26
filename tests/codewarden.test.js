@@ -7,6 +7,8 @@ const githubToken = 'thisisnotagithubrealtoken';
 const jiraUrl = 'http://codewarden-jira.com';
 const jiraUser = 'myUser';
 const jiraPwd = 'myPwd';
+const commentLang = 'English';
+;
 
 const postConfig = {
   auth: {
@@ -28,6 +30,7 @@ jest.mock('@actions/core', () => ({
     'jira-url': jiraUrl,
     'jira-user': jiraUser,
     'jira-password': jiraPwd,
+    'comment-language': commentLang,
   }[inputName] || '')),
   setFailed: jest.fn(),
   info: jest.fn(),
@@ -60,6 +63,9 @@ describe('Test Code Warden GitHub Action', () => {
  it('should analyze pull request and add comment', async () => {
     const mockPost = jest.spyOn(axios, 'post').mockResolvedValueOnce({ status: 200, data: {message: 'Pull Request Analyzed by Code Warden. Comment has been added to this Pull Request'} });
     const expectedPayload = {
+      options: {
+        language: commentLang
+      },
       action: 'review_requested',
       api_token: githubToken,
       pull_request: {
@@ -103,6 +109,10 @@ describe('Test Code Warden GitHub Action', () => {
   it('should analyze pull request found no jira key', async () => {
     const mockPost = jest.spyOn(axios, 'post').mockResolvedValueOnce({ status: 200, data: {message: 'Cannot perform Analysis - No work item was found in the pull_request for the analysis'} });
     const expectedPayload = {
+      options: {
+        language: commentLang
+
+      },
       action: 'review_requested',
       api_token: githubToken,
       pull_request: {
@@ -157,6 +167,10 @@ describe('Test Code Warden GitHub Action', () => {
   it('should handle failed analysis status error with no error code', async () => {
     const mockPostFailure = jest.spyOn(axios, 'post').mockResolvedValueOnce({ status: 500 });
     const expectedPayload = {
+      options: {
+        language: commentLang
+
+      },
       action: 'review_requested',
       api_token: githubToken,
       pull_request: {
@@ -194,6 +208,10 @@ describe('Test Code Warden GitHub Action', () => {
   it('should handle failed analysis status 500 with error code', async () => {
     const mockPostFailure = jest.spyOn(axios, 'post').mockResolvedValueOnce({ status: 500 , data: {errorCode: 1003, errorMessage: 'Internal Error has occurred'} });
     const expectedPayload = {
+      options: {
+        language: commentLang
+
+      },
       action: 'review_requested',
       api_token: githubToken,
       pull_request: {
@@ -231,6 +249,10 @@ describe('Test Code Warden GitHub Action', () => {
   it('should handle failed analysis status 400 with error code', async () => {
     const mockPostFailure = jest.spyOn(axios, 'post').mockResolvedValueOnce({ status: 400 , data: {errorCode: 1001, errorMessage: 'Bad Request'} });
     const expectedPayload = {
+      options: {
+        language: commentLang
+
+      },
       action: 'review_requested',
       api_token: githubToken,
       pull_request: {
@@ -269,6 +291,10 @@ describe('Test Code Warden GitHub Action', () => {
   it('should handle failed analysis status 404 with error code', async () => {
     const mockPostFailure = jest.spyOn(axios, 'post').mockResolvedValueOnce({ status: 404 , data: {errorCode: 1004, errorMessage: 'Not Found'} });
     const expectedPayload = {
+      options: {
+        language: commentLang
+
+      },
       action: 'review_requested',
       api_token: githubToken,
       pull_request: {
@@ -306,6 +332,10 @@ describe('Test Code Warden GitHub Action', () => {
   it('should catch unhandled response status', async () => {
     const mockPostFailure = jest.spyOn(axios, 'post').mockResolvedValueOnce({ status: 414});
     const expectedPayload = {
+      options: {
+        language: commentLang
+
+      },
       action: 'review_requested',
       api_token: githubToken,
       pull_request: {

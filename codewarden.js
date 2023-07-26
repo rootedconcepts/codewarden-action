@@ -9,6 +9,8 @@ async function runCodeWarden() {
     const jiraUrl = core.getInput('jira-url');
     const jiraUser = core.getInput('jira-user');
     const jiraPwd = core.getInput('jira-password');
+    const commentLanguage = core.getInput('comment-language');
+
     const codewardenUrl = `${jiraUrl}/rest/analyze/1.0/pr`;
 
     const { context } = github;
@@ -24,6 +26,9 @@ async function runCodeWarden() {
     const { commits_url: commitsUrl, title, url: pullRequestUrl, comments_url: commentsUrl, commits: numCommits } = pullRequest;
 
     const codewardenPayload = {
+      options: {
+        language: commentLanguage,
+      },
       action: 'review_requested',
       api_token: githubToken,
       pull_request: {

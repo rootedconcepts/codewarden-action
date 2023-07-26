@@ -19,6 +19,10 @@ inputs:
   jira-password:
     description: 'Jira password'
     required: true
+  comment-language:
+    description: 'The language you want to Analysis to appear in'
+    required: false
+    default: 'English'   
 
 runs:
   using: 'node16'
