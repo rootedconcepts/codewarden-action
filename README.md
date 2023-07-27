@@ -1,4 +1,4 @@
-[![Code Waarden](./images/logo.png)](https://codewarden.ai)
+[![Code Warden](./images/logo.png)](https://codewarden.ai)
 
 
 # [codewarden.ai](https://codewarden.ai) GitHub Action
@@ -50,16 +50,20 @@ jobs:
 
 ### `github-token`
 
-**Required** A token to access the PR detail within the Git repo. Required to update comment on PR get file associated with PR for analyzes.
+**Required** - A token to access the PR detail within the Git repo. Required to update comment on PR and to get files associated with PR for analyzes.
 
 ### `jira-url`
 
-**Required** The url of your Jira instance which has the Codew Warden plugin installed.
+**Required** - The url of your Jira instance which has the Codew Warden plugin installed.
 
 ### `jira-user`
 
-**Required** The user name for to logon to the Jira instance.
+**Required** - The user name to login to the Jira instance.
 
 ### `jira-password`
 
-**Required** The password for to user to logon to the Jira instance.
+**Required** - The password for to user to login to the Jira instance.
+
+### `comment-language`
+
+**Optional** - The language you want to display the PR comment in.
