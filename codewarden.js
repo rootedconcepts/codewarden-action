@@ -71,7 +71,7 @@ function handleResponse(response) {
     500: () => handleError(responseBody, contextError = 'Internal Server Error: Something went wrong on our side')
   };
 
-  const defaultAction = () => core.setFailed('Unexpected Error: Failed to Analyze Pull Request');
+  const defaultAction = () => core.setFailed('Unexpected Error: Failed to analyze pull request');
 
   (statuses[status] || defaultAction)();
 }
@@ -109,7 +109,7 @@ module.exports = { runCodeWarden };
 if (process.env.GITHUB_ACTIONS === 'true') {
   runCodeWarden()
     .catch(error => {
-      core.setFailed('UnExpected Error: Code Warden encountered an issue ' + error.message);
+      core.setFailed(`Unexpected Error: Code Warden encountered an issue ${error.message}`);
     });
 }
 

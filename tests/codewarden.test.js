@@ -367,7 +367,7 @@ describe('Test Code Warden GitHub Action', () => {
       postConfig
     );
     expect(core.info).toHaveBeenCalledWith('Code Warden workflow started'); 
-    expect(core.setFailed).toHaveBeenCalledWith('Unexpected Error: Failed to Analyze Pull Request');
+    expect(core.setFailed).toHaveBeenCalledWith('Unexpected Error: Failed to analyze pull request');
   });
 
 
