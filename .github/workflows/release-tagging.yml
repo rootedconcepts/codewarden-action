@@ -43,7 +43,7 @@ jobs:
             latestReleasedTagVersionWithBuild="${latestTag}"
           fi
        
-          echo "latestReleasedTagVersionWithBuild=${latestReleasedTagVersionWithBuild}
+          echo "latestReleasedTagVersionWithBuild=${latestReleasedTagVersionWithBuild}"
           echo "latestReleasedTagMajorVersion=${latestMajorVersion}"
           echo "latestReleasedVersion=${latestReleasedVersion}"
           
