@@ -4,4 +4,5 @@ module.exports = {
             lines: 80,
         },
     },
+    coverageReporters: ['lcov', 'json-summary'],
 };
