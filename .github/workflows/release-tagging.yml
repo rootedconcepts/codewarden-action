@@ -46,9 +46,9 @@ jobs:
           echo "latestReleasedTagMajorVersion=${major}"
           echo "latestReleasedVersion=${latestReleasedVersion}"
           
-          echo "latestReleasedTagVersionWithBuild=$latestReleasedTagVersionWithBuild" >> $GITHUB_ENV
-          echo "latestReleasedTagMajorVersion=$latestReleasedTagMajorVersion" >> $GITHUB_ENV
-          echo "latestReleasedVersion=$latestReleasedVersion" >> $GITHUB_ENV
+          echo "latestReleasedTagVersionWithBuild=$latestReleasedTagVersionWithBuild" >> $GITHUB_OUTPUT
+          echo "latestReleasedTagMajorVersion=$latestReleasedTagMajorVersion" >> $GITHUB_OUTPUT
+          echo "latestReleasedVersion=$latestReleasedVersion" >> $GITHUB_OUTPUT
 
       - name: Create release tags
         id: create-release-tag
