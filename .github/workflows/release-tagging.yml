@@ -13,8 +13,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Get Releases
-        id: get-releases
+      - name: Get Latest Release
+        id: get-latest-release
         uses: actions/github-script@v6
         with:
           script: |
@@ -23,13 +23,15 @@ jobs:
               repo: context.repo.repo
             });
             const releases = response.data.filter(release => !release.draft && !release.prerelease);
-            return releases;
+            const latestReleaseTag = releases[0]?.tag_name || "0.0.0";
+            return latestReleaseTag
+          
+  
 
       - name: Get Latest Release Tag Version
         id: get-latest-release-tag
         run: |
-          releases=$(echo "${{ steps.get-releases.outputs.result }}" | jq 'sort_by(.created_at) | reverse')
-          latestTag=$(echo "$releases" | jq -r '.[0].tag_name')
+          latestTag=${{ steps.get-latest-release.outputs.result }}
           if [[ $latestTag =~ v([0-9]+)\.([0-9]+)\.([0-9]+) ]]; then
             major="${BASH_REMATCH[1]}"
             minor="${BASH_REMATCH[2]}"
