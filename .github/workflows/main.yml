@@ -56,11 +56,56 @@ jobs:
       - name: Test
         run: npm test -- --coverage
 
+      - name: Extract Total Code Coverage
+        id: extract-coverage
+        run: |
+              overallCoverage=$(jq -r '.total.lines.pct' coverage/coverage-summary.json)
+              roundedCoverage=$(echo "$overallCoverage" | awk '{printf "%.0f", $0}')
+              echo "Overall Code Coverage: $roundedCoverage%"
+              echo "coverage=$roundedCoverage" >> $GITHUB_OUTPUT
+  
+      - name: Set Badge Color
+        id: set-badge-color
+        run: |
+              if [[ ${{ steps.extract-coverage.outputs.coverage }} -gt 75 ]]; then
+                echo "badgeColor=green" 
+                echo "badgeColor=green" >> $GITHUB_OUTPUT
+              elif [[ ${{ steps.extract-coverage.outputs.coverage }} -gt 50 ]]; then
+                echo "badgeColor=yellow" 
+                echo "badgeColor=yellow" >> $GITHUB_OUTPUT
+              else
+                echo "badgeColor=red" 
+                echo "badgeColor=red" >> $GITHUB_OUTPUT
+              fi
+             
+      - name: Update Badges in README.md
+        run: |
+              sed -i 's/Jest%20Coverage-.*/Jest%20Coverage-${{ steps.extract-coverage.outputs.coverage }}-${{ steps.set-badge-color.outputs.badgeColor }}.svg)/' README.md
+           
+      - name: Commit and Push README Changes
+        run: |
+              git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+              git config --global user.name "${{ github.actor }}"
+              # Check if the README.md file has been modified
+              if [[ -n "$(git status --porcelain README.md)" ]]; then
+                # Add the README.md file to the staging area
+                git add README.md
+    
+                # Commit the changes with a commit message
+                git commit -m "Update badges in README.md"
+    
+                # Push the changes to the remote repository
+                git push
+              else
+                echo "No changes to README.md. Skipping commit and push."
+              fi  
+
       - name: Upload Jest coverage report
         uses: actions/upload-artifact@v3
         with:
           name: jest-report
           path: coverage/lcov-report/*
+
       
       - name: Create tag
         run: |
