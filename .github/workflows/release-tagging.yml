@@ -43,7 +43,7 @@ jobs:
             latestReleasedTagVersionWithBuild="${latestTag}"
           fi
        
-          echo "latestReleasedTagVersionWithBuild=${latestReleasedTagVersionWithBuild}"
+          echo "latestReleasedTagVersionWithBuild=${{ steps.get-latest-release-tag.outputs.latestReleasedVersion }}"
           echo "latestReleasedTagMajorVersion=${latestMajorVersion}"
           echo "latestReleasedVersion=${latestReleasedVersion}"
           
@@ -54,28 +54,26 @@ jobs:
       - name: Create release tags
         id: create-release-tag
         run: |
-            tagMajorVersion="v${{ steps.get-latest-release-tag.outputs.latestReleasedTagMajorVersion }}"
-            latestReleasedVersion="v${{ steps.get-latest-release-tag.outputs.latestReleasedVersion }}"
             git config --global user.email "${{ github.actor }}@users.noreply.github.com"
             git config --global user.name "${{ github.actor }}"
 
-            if git show-ref --tags --quiet --verify -- "refs/tags/${tagMajorVersion}"; then
-              echo "Tag '${tagMajorVersion}' already exists. Deleting the existing tag to recreate"
-              git tag -d "${tagMajorVersion}"
-              git push --delete origin "${tagMajorVersion}"
+            if git show-ref --tags --quiet --verify -- "refs/tags/v${{ steps.get-latest-release-tag.outputs.latestReleasedTagMajorVersion }}"; then
+               echo "Tag 'v${{ steps.get-latest-release-tag.outputs.latestReleasedTagMajorVersion }}' already exists. Deleting the existing tag to recreate"
+               git tag -d "v${{ steps.get-latest-release-tag.outputs.latestReleasedTagMajorVersion }}"
+              git push --delete origin "v${{ steps.get-latest-release-tag.outputs.latestReleasedTagMajorVersion }}"
             fi
 
-            if git show-ref --tags --quiet --verify -- "refs/tags/${latestReleasedVersion}"; then
-              echo "Tag '${latestReleasedVersion}' already exists. Deleting the existing tag to recreate"
-              git tag -d "${latestReleasedVersion}"
-              git push --delete origin "${latestReleasedVersion}"
+            if git show-ref --tags --quiet --verify -- "refs/tags/v${{ steps.get-latest-release-tag.outputs.latestReleasedVersion }}"; then
+              echo "Tag 'v${{ steps.get-latest-release-tag.outputs.latestReleasedVersion }}' already exists. Deleting the existing tag to recreate"
+              git tag -d "v${{ steps.get-latest-release-tag.outputs.latestReleasedVersion }}"
+              git push --delete origin "v${{ steps.get-latest-release-tag.outputs.latestReleasedVersion }}"
             fi
 
-            echo "Creating tag ${tagMajorVersion} from ${latestReleasedTagVersionWithBuild}"
-            git tag ${tagMajorVersion} ${latestReleasedTagVersionWithBuild}
-            git push origin ${tagMajorVersion}
+            echo "Creating tag v${{ steps.get-latest-release-tag.outputs.latestReleasedTagMajorVersion }} from ${{ steps.get-latest-release-tag.outputs.latestReleasedVersion }}"
+            git tag v${{ steps.get-latest-release-tag.outputs.latestReleasedTagMajorVersion }} ${{ steps.get-latest-release-tag.outputs.latestReleasedVersion }}
+            git push origin v${{ steps.get-latest-release-tag.outputs.latestReleasedTagMajorVersion }}
 
-            echo "Creating tag ${latestReleasedVersion} from ${latestReleasedTagVersionWithBuild}"
-            git tag ${latestReleasedVersion} ${latestReleasedTagVersionWithBuild}
-            git push origin ${latestReleasedVersion}
+            echo "Creating tag v${{ steps.get-latest-release-tag.outputs.latestReleasedVersion }} from ${{ steps.get-latest-release-tag.outputs.latestReleasedVersion }}"
+            git tag v${{ steps.get-latest-release-tag.outputs.latestReleasedVersion }} ${{ steps.get-latest-release-tag.outputs.latestReleasedVersion }}
+            git push origin v${{ steps.get-latest-release-tag.outputs.latestReleasedVersion }}
 
