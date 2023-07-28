@@ -11,7 +11,7 @@ This action will analyze your pull request code using [Code Warden](https://code
 In order to use this action you will require
 
 1. Jira Data Center edition
-2. The Jira [Code Warden plugin](https://marketplace.atlassian.com/) installed from the market place into your Jira Data Center edition
+2. The Jira [Code Warden plugin](https://marketplace.atlassian.com/) installed from the Atlassian market place in your Jira Data Center edition
 
 ---
 ## Usage
@@ -50,11 +50,11 @@ jobs:
 
 ### `github-token`
 
-**Required** - A token to access the PR detail within the Git repo. Required to update comment on PR and to get files associated with PR for analyzes.
+**Required** - A token to access the PR detail within the Git repo. This is required for Code Warden to be able to post a comment on the PR and read files associated with the PR for analysis.
 
 ### `jira-url`
 
-**Required** - The url of your Jira instance which has the Codew Warden plugin installed.
+**Required** - The URL of your Jira instance which has the Code Warden plugin installed.
 
 ### `jira-user`
 
@@ -62,8 +62,8 @@ jobs:
 
 ### `jira-password`
 
-**Required** - The password for to user to login to the Jira instance.
+**Required** - The password for the user to login to the Jira instance.
 
 ### `comment-language`
 
-**Optional** - The language you want to display the PR comment in.
+**Optional** - The language you want to display the Code Warden analysis in.
