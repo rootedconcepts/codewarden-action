@@ -1,0 +1,78 @@
+name: Code Warden Release Tagging
+
+on:
+  release:
+    types:
+      - created
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Get Releases
+        id: get-releases
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const response = await github.rest.repos.listReleases({
+              owner: context.repo.owner,
+              repo: context.repo.repo
+            });
+            const releases = response.data.filter(release => !release.draft && !release.prerelease);
+            return releases;
+
+      - name: Get Latest Release Tag Version
+        id: get-latest-release-tag
+        run: |
+          if [[ -z "${{ steps.get-releases.outputs.result }}" ]]; then
+              echo "No regular releases found. Failing the workflow."
+              exit 1
+          else
+            releases=$(echo "${{ steps.get-releases.outputs.result }}" | jq 'sort_by(.created_at) | reverse')
+            latestTag=$(echo "$releases" | jq -r '.[0].tag_name')
+            if [[ $latestTag =~ v([0-9]+)\.([0-9]+)\.([0-9]+) ]]; then
+              major="${BASH_REMATCH[1]}"
+              minor="${BASH_REMATCH[2]}"
+              patch="${BASH_REMATCH[3]}"
+              latestReleasedVersion="${major}.${minor}.${patch}"
+              latestReleasedTagVersionWithBuild="${latestTag}"
+            fi
+          fi
+          echo "latestReleasedTagVersionWithBuild=${latestReleasedTagVersionWithBuild}"
+          echo "latestReleasedTagMajorVersion=${major}"
+          echo "latestReleasedVersion=${latestReleasedVersion}"
+          
+          echo "latestReleasedTagVersionWithBuild=$latestReleasedTagVersionWithBuild" >> $GITHUB_ENV
+          echo "latestReleasedTagMajorVersion=$latestReleasedTagMajorVersion" >> $GITHUB_ENV
+          echo "latestReleasedVersion=$latestReleasedVersion" >> $GITHUB_ENV
+
+      - name: Create release tags
+        id: create-release-tag
+        run: |
+            tagMajorVersion=v${{ steps.get-latest-release-tag.outputs.latestReleasedTagMajorVersion }}
+            latestReleasedVersion=v${{ steps.get-latest-release-tag.outputs.latestReleasedVersion }}
+            git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+            git config --global user.name "${{ github.actor }}"
+
+            if git show-ref --tags --quiet --verify -- "refs/tags/${tagMajorVersion}"; then
+              echo "Tag '${tagMajorVersion}' already exists. Deleting the existing tag to recreate"
+              git tag -d "${tagMajorVersion}"
+              git push --delete origin "${tagMajorVersion}"
+            fi
+
+            if git show-ref --tags --quiet --verify -- "refs/tags/${latestReleasedVersion}"; then
+              echo "Tag '${latestReleasedVersion}' already exists. Deleting the existing tag to recreate"
+              git tag -d "${latestReleasedVersion}"
+              git push --delete origin "${latestReleasedVersion}"
+            fi
+
+            git tag ${tagMajorVersion} ${latestReleasedTagVersionWithBuild}
+            git push origin ${tagMajorVersion}
+
+            git tag ${latestReleasedVersion} ${latestReleasedTagVersionWithBuild}
+            git push origin ${latestReleasedVersion}
+
