@@ -38,12 +38,13 @@ jobs:
             major="${BASH_REMATCH[1]}"
             minor="${BASH_REMATCH[2]}"
             patch="${BASH_REMATCH[3]}"
+            latestMajorVersion="${major}"
             latestReleasedVersion="${major}.${minor}.${patch}"
             latestReleasedTagVersionWithBuild="${latestTag}"
           fi
        
           echo "latestReleasedTagVersionWithBuild=${latestReleasedTagVersionWithBuild}"
-          echo "latestReleasedTagMajorVersion=${major}"
+          echo "latestReleasedTagMajorVersion=${latestMajorVersion}"
           echo "latestReleasedVersion=${latestReleasedVersion}"
           
           echo "latestReleasedTagVersionWithBuild=$latestReleasedTagVersionWithBuild" >> $GITHUB_OUTPUT
@@ -70,9 +71,11 @@ jobs:
               git push --delete origin "${latestReleasedVersion}"
             fi
 
+            echo "Creating tag ${tagMajorVersion} from ${latestReleasedTagVersionWithBuild}"
             git tag ${tagMajorVersion} ${latestReleasedTagVersionWithBuild}
             git push origin ${tagMajorVersion}
 
+            echo "Creating tag ${latestReleasedVersion} from ${latestReleasedTagVersionWithBuild}"
             git tag ${latestReleasedVersion} ${latestReleasedTagVersionWithBuild}
             git push origin ${latestReleasedVersion}
 
