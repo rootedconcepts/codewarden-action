@@ -28,20 +28,16 @@ jobs:
       - name: Get Latest Release Tag Version
         id: get-latest-release-tag
         run: |
-          if [[ -z "${{ steps.get-releases.outputs.result }}" ]]; then
-              echo "No regular releases found. Failing the workflow."
-              exit 1
-          else
-            releases=$(echo "${{ steps.get-releases.outputs.result }}" | jq 'sort_by(.created_at) | reverse')
-            latestTag=$(echo "$releases" | jq -r '.[0].tag_name')
-            if [[ $latestTag =~ v([0-9]+)\.([0-9]+)\.([0-9]+) ]]; then
-              major="${BASH_REMATCH[1]}"
-              minor="${BASH_REMATCH[2]}"
-              patch="${BASH_REMATCH[3]}"
-              latestReleasedVersion="${major}.${minor}.${patch}"
-              latestReleasedTagVersionWithBuild="${latestTag}"
-            fi
+          releases=$(echo "${{ steps.get-releases.outputs.result }}" | jq 'sort_by(.created_at) | reverse')
+          latestTag=$(echo "$releases" | jq -r '.[0].tag_name')
+          if [[ $latestTag =~ v([0-9]+)\.([0-9]+)\.([0-9]+) ]]; then
+            major="${BASH_REMATCH[1]}"
+            minor="${BASH_REMATCH[2]}"
+            patch="${BASH_REMATCH[3]}"
+            latestReleasedVersion="${major}.${minor}.${patch}"
+            latestReleasedTagVersionWithBuild="${latestTag}"
           fi
+       
           echo "latestReleasedTagVersionWithBuild=${latestReleasedTagVersionWithBuild}"
           echo "latestReleasedTagMajorVersion=${major}"
           echo "latestReleasedVersion=${latestReleasedVersion}"
