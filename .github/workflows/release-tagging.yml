@@ -43,7 +43,7 @@ jobs:
             latestReleasedTagVersionWithBuild="${latestTag}"
           fi
        
-          echo "latestReleasedTagVersionWithBuild=${{ steps.get-latest-release-tag.outputs.latestReleasedVersion }}"
+          echo "latestReleasedTagVersionWithBuild=${latestReleasedTagVersionWithBuild}
           echo "latestReleasedTagMajorVersion=${latestMajorVersion}"
           echo "latestReleasedVersion=${latestReleasedVersion}"
           
@@ -57,23 +57,23 @@ jobs:
             git config --global user.email "${{ github.actor }}@users.noreply.github.com"
             git config --global user.name "${{ github.actor }}"
 
-            if git show-ref --tags --quiet --verify -- "refs/tags/v${{ steps.get-latest-release-tag.outputs.latestReleasedTagMajorVersion }}"; then
+            if git show-ref --tags --verify -- "refs/tags/v${{ steps.get-latest-release-tag.outputs.latestReleasedTagMajorVersion }}"  >/dev/null 2>&1; then
                echo "Tag 'v${{ steps.get-latest-release-tag.outputs.latestReleasedTagMajorVersion }}' already exists. Deleting the existing tag to recreate"
                git tag -d "v${{ steps.get-latest-release-tag.outputs.latestReleasedTagMajorVersion }}"
-              git push --delete origin "v${{ steps.get-latest-release-tag.outputs.latestReleasedTagMajorVersion }}"
+               git push --delete origin "v${{ steps.get-latest-release-tag.outputs.latestReleasedTagMajorVersion }}"
             fi
 
-            if git show-ref --tags --quiet --verify -- "refs/tags/v${{ steps.get-latest-release-tag.outputs.latestReleasedVersion }}"; then
+            if git show-ref --tags --verify -- "refs/tags/v${{ steps.get-latest-release-tag.outputs.latestReleasedVersion }}" >/dev/null 2>&1; then
               echo "Tag 'v${{ steps.get-latest-release-tag.outputs.latestReleasedVersion }}' already exists. Deleting the existing tag to recreate"
               git tag -d "v${{ steps.get-latest-release-tag.outputs.latestReleasedVersion }}"
               git push --delete origin "v${{ steps.get-latest-release-tag.outputs.latestReleasedVersion }}"
             fi
 
-            echo "Creating tag v${{ steps.get-latest-release-tag.outputs.latestReleasedTagMajorVersion }} from ${{ steps.get-latest-release-tag.outputs.latestReleasedVersion }}"
-            git tag v${{ steps.get-latest-release-tag.outputs.latestReleasedTagMajorVersion }} ${{ steps.get-latest-release-tag.outputs.latestReleasedVersion }}
+            echo "Creating tag v${{ steps.get-latest-release-tag.outputs.latestReleasedTagMajorVersion }} from ${{ steps.get-latest-release-tag.outputs.latestReleasedTagVersionWithBuild }}"
+            git tag v${{ steps.get-latest-release-tag.outputs.latestReleasedTagMajorVersion }} ${{ steps.get-latest-release-tag.outputs.latestReleasedTagVersionWithBuild }}
             git push origin v${{ steps.get-latest-release-tag.outputs.latestReleasedTagMajorVersion }}
 
-            echo "Creating tag v${{ steps.get-latest-release-tag.outputs.latestReleasedVersion }} from ${{ steps.get-latest-release-tag.outputs.latestReleasedVersion }}"
-            git tag v${{ steps.get-latest-release-tag.outputs.latestReleasedVersion }} ${{ steps.get-latest-release-tag.outputs.latestReleasedVersion }}
+            echo "Creating tag v${{ steps.get-latest-release-tag.outputs.latestReleasedVersion }} from ${{ steps.get-latest-release-tag.outputs.latestReleasedTagVersionWithBuild }}"
+            git tag v${{ steps.get-latest-release-tag.outputs.latestReleasedVersion }} ${{ steps.get-latest-release-tag.outputs.latestReleasedTagVersionWithBuild }}
             git push origin v${{ steps.get-latest-release-tag.outputs.latestReleasedVersion }}
 
