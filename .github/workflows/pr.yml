@@ -26,25 +26,22 @@ jobs:
               repo: context.repo.repo
             });
             const releases = response.data.filter(release => !release.draft && !release.prerelease);
-            return releases;
+            const latestReleaseTag = releases[0]?.tag_name || "0.0.0";
+            return latestReleaseTag
       
       - name: Get Latest Release Version
         id: get-latest-release
         run: |
-            if [[ -z "${{ steps.get-releases.outputs.result }}" ]]; then
-              latestReleasedVersion="0.0.0"
-            else
-              releases=$(echo "${{ steps.get-releases.outputs.result }}" | jq 'sort_by(.created_at) | reverse')
-              latestTag=$(echo "$releases" | jq -r '.[0].tag_name')
-              if [[ $latestTag =~ v([0-9]+)\.([0-9]+)\.([0-9]+)\. ]]; then
+            latestTag=${{ steps.get-releases.outputs.result }}
+            if [[ $latestTag =~ v([0-9]+)\.([0-9]+)\.([0-9]+)\. ]]; then
                 major="${BASH_REMATCH[1]}"
                 minor="${BASH_REMATCH[2]}"
                 patch="${BASH_REMATCH[3]}"
                 latestReleasedVersion="${major}.${minor}.${patch}"
-              else
+            else
                 latestReleasedVersion="0.0.0"
-              fi
             fi
+           
             echo "latestReleasedVersion=${latestReleasedVersion}"
             echo "latestReleasedVersion=$latestReleasedVersion" >> $GITHUB_OUTPUT
     
