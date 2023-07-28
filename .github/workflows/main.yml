@@ -21,7 +21,7 @@ jobs:
         id:  set-build-number
         run: |
           git fetch --prune --tags
-          latestTag=$(git for-each-ref --sort=-creatordate --format '%(refname:short)' refs/tags --count=1)
+          latestTag=$(git for-each-ref --sort=-creatordate --format='%(refname:lstrip=2)' refs/tags/v[0-9]*.[0-9]*.[0-9]*.[0-9]* | head -n 1)
           packageVersion=$(node -p "require('./package.json').version")
           
           if [[ -z $latestTag ]]; then
