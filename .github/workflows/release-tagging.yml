@@ -48,14 +48,14 @@ jobs:
           echo "latestReleasedVersion=${latestReleasedVersion}"
           
           echo "latestReleasedTagVersionWithBuild=$latestReleasedTagVersionWithBuild" >> $GITHUB_OUTPUT
-          echo "latestReleasedTagMajorVersion=$latestReleasedTagMajorVersion" >> $GITHUB_OUTPUT
+          echo "latestReleasedTagMajorVersion=$latestMajorVersion" >> $GITHUB_OUTPUT
           echo "latestReleasedVersion=$latestReleasedVersion" >> $GITHUB_OUTPUT
 
       - name: Create release tags
         id: create-release-tag
         run: |
-            tagMajorVersion=v${{ steps.get-latest-release-tag.outputs.latestReleasedTagMajorVersion }}
-            latestReleasedVersion=v${{ steps.get-latest-release-tag.outputs.latestReleasedVersion }}
+            tagMajorVersion="v${{ steps.get-latest-release-tag.outputs.latestReleasedTagMajorVersion }}"
+            latestReleasedVersion="v${{ steps.get-latest-release-tag.outputs.latestReleasedVersion }}"
             git config --global user.email "${{ github.actor }}@users.noreply.github.com"
             git config --global user.name "${{ github.actor }}"
 
