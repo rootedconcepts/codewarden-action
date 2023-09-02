@@ -2,6 +2,7 @@ const core = require('@actions/core');
 const axios = require('axios');
 const github = require('@actions/github');
 
+
 async function runCodeWarden() {
   try {
     core.info('Code Warden workflow started');
@@ -57,12 +58,21 @@ async function runCodeWarden() {
 
 
   } catch (error) {
-    handleError(null, error.message);
+    if (error.response) {
+      handleResponse(error.response);
+    }
+    else{
+      handleError(null, error.message);
+    }
+   
+
   }
 }
 
 function handleResponse(response) {
   const { status, data: responseBody } = response;
+  core.debug('response status:' + status);
+  core.debug('response body:' + responseBody);
 
   const statuses = {
     200: () => handleSuccess(responseBody),
@@ -76,6 +86,7 @@ function handleResponse(response) {
 
   (statuses[status] || defaultAction)();
 }
+
 
 function handleSuccess(responseBody) {
   let codeWardenMessage = responseBody.message;
@@ -92,7 +103,7 @@ function handleError(responseBody = null, contextError = null) {
   if (contextError != null) {
     codeWardenErrorMessage = `Unexpected Error: Code Warden encountered an issue \n ${contextError}`;
   }
-  
+
 
   if (responseBody) {
     responseErrorCode = responseBody.errorCode;
@@ -104,6 +115,7 @@ function handleError(responseBody = null, contextError = null) {
   }
   return core.setFailed(codeWardenErrorMessage);
 }
+
 
 module.exports = { runCodeWarden };
 // Check if running in GitHub Actions

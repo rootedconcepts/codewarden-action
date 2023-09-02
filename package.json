@@ -1,6 +1,6 @@
 {
   "name": "codewarden-action",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "GitHub action for running code warden analysis",
   "main": "codewarden.js",
   "scripts": {
