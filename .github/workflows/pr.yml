@@ -34,7 +34,7 @@ jobs:
         id: get-latest-release
         run: |
             latestTag=${{ steps.get-releases.outputs.result }}
-            if [[ $latestTag =~ v([0-9]+)\.([0-9]+)\.([0-9]+)\. ]]; then
+            if [[ $latestTag =~ v([0-9]+)\.([0-9]+)\.([0-9]+) ]]; then
                 major="${BASH_REMATCH[1]}"
                 minor="${BASH_REMATCH[2]}"
                 patch="${BASH_REMATCH[3]}"
