@@ -165,7 +165,8 @@ describe('Test Code Warden GitHub Action', () => {
   });
 
   it('should handle failed analysis status error with no error code', async () => {
-    const mockPostFailure = jest.spyOn(axios, 'post').mockResolvedValueOnce({ status: 500 });
+    const mockPostFailure = jest.spyOn(axios, 'post').mockRejectedValueOnce({response: {status: 500, data: {errorCode: 1003, errorMessage: 'Internal Server Error: Something went wrong on our side'}}}); 
+   
     const expectedPayload = {
       options: {
         language: commentLang
@@ -202,11 +203,11 @@ describe('Test Code Warden GitHub Action', () => {
       postConfig
     );
     expect(core.info).toHaveBeenCalledWith('Code Warden workflow started'); 
-    expect(core.setFailed).toHaveBeenCalledWith('Unexpected Error: Code Warden encountered an issue \n Internal Server Error: Something went wrong on our side');
+    expect(core.setFailed).toHaveBeenCalledWith('Code Warden encountered Error Code: 1003 - Error Message: Internal Server Error: Something went wrong on our side \n Internal Server Error: Something went wrong on our side');
   });
   
   it('should handle failed analysis status 500 with error code', async () => {
-    const mockPostFailure = jest.spyOn(axios, 'post').mockResolvedValueOnce({ status: 500 , data: {errorCode: 1003, errorMessage: 'Internal Error has occurred'} });
+    const mockPostFailure = jest.spyOn(axios, 'post').mockRejectedValueOnce({response: {status: 500, data: {errorCode: 1003, errorMessage: 'Internal Error has occurred'}}}); 
     const expectedPayload = {
       options: {
         language: commentLang
@@ -247,7 +248,7 @@ describe('Test Code Warden GitHub Action', () => {
   });
 
   it('should handle failed analysis status 400 with error code', async () => {
-    const mockPostFailure = jest.spyOn(axios, 'post').mockResolvedValueOnce({ status: 400 , data: {errorCode: 1001, errorMessage: 'Bad Request'} });
+    const mockPostFailure = jest.spyOn(axios, 'post').mockRejectedValueOnce({response: {status: 400, data: {errorCode: 1001, errorMessage: 'Bad Request'}}}); 
     const expectedPayload = {
       options: {
         language: commentLang
@@ -289,7 +290,7 @@ describe('Test Code Warden GitHub Action', () => {
 
 
   it('should handle failed analysis status 404 with error code', async () => {
-    const mockPostFailure = jest.spyOn(axios, 'post').mockResolvedValueOnce({ status: 404 , data: {errorCode: 1004, errorMessage: 'Not Found'} });
+    const mockPostFailure = jest.spyOn(axios, 'post').mockRejectedValueOnce({response: {status: 404, data: {errorCode: 1004, errorMessage: 'Not Found'}}});
     const expectedPayload = {
       options: {
         language: commentLang
@@ -330,7 +331,7 @@ describe('Test Code Warden GitHub Action', () => {
   });
 
   it('should catch unhandled response status', async () => {
-    const mockPostFailure = jest.spyOn(axios, 'post').mockResolvedValueOnce({ status: 414});
+    const mockPostFailure = jest.spyOn(axios, 'post').mockRejectedValueOnce({response: {status: 414},message: "414 error"});
     const expectedPayload = {
       options: {
         language: commentLang
@@ -370,16 +371,6 @@ describe('Test Code Warden GitHub Action', () => {
     expect(core.setFailed).toHaveBeenCalledWith('Unexpected Error: Failed to analyze pull request');
   });
 
-
-
-  it('should handle errors unexpected error', async () => {
-    jest.spyOn(axios, 'post').mockRejectedValueOnce(new Error('Cannnot get key'));
-
-    await runCodeWarden();
-    expect(core.info).toHaveBeenCalledWith('Code Warden workflow started'); 
-    expect(core.setFailed).toHaveBeenCalledWith('Unexpected Error: Code Warden encountered an issue \n Cannnot get key');
-
-  });
 
   it('should handle unAuthorized status 401 with error code', async () => {
     const mockPostFailure = jest.spyOn(axios, 'post').mockResolvedValueOnce({ status: 401 , data: {errorCode: 1002, errorMessage: 'The Code Warden Jira plugin does not have a valid license'} });

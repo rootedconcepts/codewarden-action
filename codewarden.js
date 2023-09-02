@@ -54,18 +54,24 @@ async function runCodeWarden() {
 
     core.info('Calling Code Warden Endpoint: ' + codewardenUrl);
     const response = await axios.post(codewardenUrl, codewardenPayload, config);
-    const { status, data: responseBody } = response;
-    handleResponse(status,responseBody);
+    handleResponse(response);
 
 
   } catch (error) {
-    core.debug('error status:' + error.response.status);
-    handleResponse(error.response.status,error.message);
-  
+    if (error.response) {
+      core.debug('error response:' + JSON.stringify(error.response));
+      handleResponse(error.response);
+    }
+    else{
+      handleError(null, error.message);
+    }
+   
+
   }
 }
 
-function handleResponse(status,responseBody) {
+function handleResponse(response) {
+  const { status, data: responseBody } = response;
   core.debug('response status:' + status);
   core.debug('response body:' + responseBody);
 
@@ -76,9 +82,12 @@ function handleResponse(status,responseBody) {
     404: () => handleError(responseBody, contextError = 'Not Found: Requested resource could not be found'),
     500: () => handleError(responseBody, contextError = 'Internal Server Error: Something went wrong on our side')
   };
-  
-  (statuses[status] || handleError(null,responseBody))();
+
+  const defaultAction = () => core.setFailed('Unexpected Error: Failed to analyze pull request');
+
+  (statuses[status] || defaultAction)();
 }
+
 
 function handleSuccess(responseBody) {
   let codeWardenMessage = responseBody.message;
@@ -95,7 +104,7 @@ function handleError(responseBody = null, contextError = null) {
   if (contextError != null) {
     codeWardenErrorMessage = `Unexpected Error: Code Warden encountered an issue \n ${contextError}`;
   }
-  
+
 
   if (responseBody) {
     responseErrorCode = responseBody.errorCode;
@@ -107,6 +116,7 @@ function handleError(responseBody = null, contextError = null) {
   }
   return core.setFailed(codeWardenErrorMessage);
 }
+
 
 module.exports = { runCodeWarden };
 // Check if running in GitHub Actions
