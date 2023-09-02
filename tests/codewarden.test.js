@@ -419,7 +419,7 @@ describe('Test Code Warden GitHub Action', () => {
       postConfig
     );
     expect(core.info).toHaveBeenCalledWith('Code Warden workflow started'); 
-    expect(core.setFailed).toHaveBeenCalledWith('Code Warden encountered Error Code: 1002 - Error Message: The Code Warden Jira plugin does not have a valid license \n UnAuthorized: Invalid Liceense');
+    expect(core.setFailed).toHaveBeenCalledWith('Code Warden encountered Error Code: 1002 - Error Message: The Code Warden Jira plugin does not have a valid license \n UnAuthorized: Invalid License');
   });
 
 });
