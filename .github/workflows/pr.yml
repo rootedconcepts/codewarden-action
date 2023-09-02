@@ -25,12 +25,10 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo
             });
-            const releaseNamePattern = /^v\d+\.\d+\.\d+$/; // Match tags like "v1.2.3"
-
-            const releases = response.data.filter(release => !release.draft && !release.prerelease &&
-            releaseNamePattern.test(release.tag_name));
-            const latestReleaseTag = releases[0]?.tag_name || "0.0.0";
-            return latestReleaseTag
+          
+            const releases = response.data.filter(release => !release.draft && !release.prerelease);
+            const latestReleaseName = releases[0]?.name || "0.0.0";
+            return latestReleaseName
       
       - name: Get Latest Release Version
         id: get-latest-release
