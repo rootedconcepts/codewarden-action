@@ -2,13 +2,6 @@ const core = require('@actions/core');
 const axios = require('axios');
 const github = require('@actions/github');
 
-const statuses = {
-  200: () => handleSuccess(responseBody),
-  400: () => handleError(responseBody, contextError = 'Bad Request: Please check all required fields'),
-  401: () => handleError(responseBody, contextError = 'UnAuthorized: Invalid License'),
-  404: () => handleError(responseBody, contextError = 'Not Found: Requested resource could not be found'),
-  500: () => handleError(responseBody, contextError = 'Internal Server Error: Something went wrong on our side')
-};
 
 async function runCodeWarden() {
   try {
@@ -61,24 +54,30 @@ async function runCodeWarden() {
 
     core.info('Calling Code Warden Endpoint: ' + codewardenUrl);
     const response = await axios.post(codewardenUrl, codewardenPayload, config);
-    handleResponse(response);
+    const { status, data: responseBody } = response;
+    handleResponse(status,responseBody);
 
 
   } catch (error) {
     core.debug('error status:' + error.response.status);
-    (statuses[error.response.status] ||  handleError(null, error.message))();
+    handleResponse(error.response.status,error.message);
   
   }
 }
 
-function handleResponse(response) {
-  const { status, data: responseBody } = response;
+function handleResponse(status,responseBody) {
   core.debug('response status:' + status);
-  core.debug('response body:' + JSON.stringify(response));
+  core.debug('response body:' + responseBody);
 
-  const defaultAction = () => core.setFailed('Unexpected Error: Failed to analyze pull request');
-
-  (statuses[status] || defaultAction)();
+  const statuses = {
+    200: () => handleSuccess(responseBody),
+    400: () => handleError(responseBody, contextError = 'Bad Request: Please check all required fields'),
+    401: () => handleError(responseBody, contextError = 'UnAuthorized: Invalid License'),
+    404: () => handleError(responseBody, contextError = 'Not Found: Requested resource could not be found'),
+    500: () => handleError(responseBody, contextError = 'Internal Server Error: Something went wrong on our side')
+  };
+  
+  (statuses[status] || handleError(null,responseBody))();
 }
 
 function handleSuccess(responseBody) {
