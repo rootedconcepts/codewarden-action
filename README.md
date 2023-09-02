@@ -3,7 +3,7 @@
 
 # [codewarden.ai](https://codewarden.ai) GitHub Action
 
-![jest Coverage](https://img.shields.io/badge/Jest%20Coverage-98-green.svg)
+![jest Coverage](https://img.shields.io/badge/Jest%20Coverage-100-green.svg)
 
 This action will analyze your pull request code using [Code Warden](https://codewarden.ai) against the requirements detailed in your Jira ticket
 
