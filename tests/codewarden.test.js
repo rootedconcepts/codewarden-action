@@ -380,5 +380,47 @@ describe('Test Code Warden GitHub Action', () => {
     expect(core.setFailed).toHaveBeenCalledWith('Unexpected Error: Code Warden encountered an issue \n Cannnot get key');
 
   });
+
+  it('should handle unAuthorized status 401 with error code', async () => {
+    const mockPostFailure = jest.spyOn(axios, 'post').mockResolvedValueOnce({ status: 401 , data: {errorCode: 1002, errorMessage: 'The Code Warden Jira plugin does not have a valid license'} });
+    const expectedPayload = {
+      options: {
+        language: commentLang
+
+      },
+      action: 'review_requested',
+      api_token: githubToken,
+      pull_request: {
+        commits:1,
+        commits_url: 'https://api.github.com/repos/owner/repo/pulls/1/commits',
+        title: 'ABC-123: Sample pull request title',
+        files_url: 'https://api.github.com/repos/owner/repo/pulls/1/files',
+        comments_url: 'https://api.github.com/repos/owner/repo/pulls/1/comments'
+      }
+    };
+
+    const github = require('@actions/github');
+    github.context.eventName = 'pull_request';
+    github.context.payload = {
+      pull_request: {
+        commits:1,
+        commits_url: 'https://api.github.com/repos/owner/repo/pulls/1/commits',
+        title: 'ABC-123: Sample pull request title',
+        url: 'https://api.github.com/repos/owner/repo/pulls/1',
+        comments_url: 'https://api.github.com/repos/owner/repo/pulls/1/comments',
+      },
+    };
+  
+    await runCodeWarden();
+  
+    expect(mockPostFailure).toHaveBeenCalledWith(
+      expectUrl,
+      expectedPayload,
+      postConfig
+    );
+    expect(core.info).toHaveBeenCalledWith('Code Warden workflow started'); 
+    expect(core.setFailed).toHaveBeenCalledWith('Code Warden encountered Error Code: 1002 - Error Message: The Code Warden Jira plugin does not have a valid license \n UnAuthorized: Invalid Liceense');
+  });
+
 });
 
