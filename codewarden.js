@@ -67,7 +67,7 @@ function handleResponse(response) {
   const statuses = {
     200: () => handleSuccess(responseBody),
     400: () => handleError(responseBody, contextError = 'Bad Request: Please check all required fields'),
-    401: () => handleError(responseBody, contextError = 'UnAuthorized: Invalid Liceense'),
+    401: () => handleError(responseBody, contextError = 'UnAuthorized: Invalid License'),
     404: () => handleError(responseBody, contextError = 'Not Found: Requested resource could not be found'),
     500: () => handleError(responseBody, contextError = 'Internal Server Error: Something went wrong on our side')
   };
@@ -109,8 +109,5 @@ module.exports = { runCodeWarden };
 // Check if running in GitHub Actions
 if (process.env.GITHUB_ACTIONS === 'true') {
   runCodeWarden()
-    .catch(error => {
-      core.setFailed(`Unexpected Error: Code Warden encountered an issue ${error.message}`);
-    });
 }
 
