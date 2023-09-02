@@ -109,8 +109,5 @@ module.exports = { runCodeWarden };
 // Check if running in GitHub Actions
 if (process.env.GITHUB_ACTIONS === 'true') {
   runCodeWarden()
-    .catch(error => {
-      core.setFailed(`Unexpected Error: Code Warden encountered an issue ${error.message}`);
-    });
 }
 
