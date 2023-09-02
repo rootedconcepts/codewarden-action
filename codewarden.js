@@ -2,6 +2,14 @@ const core = require('@actions/core');
 const axios = require('axios');
 const github = require('@actions/github');
 
+const statuses = {
+  200: () => handleSuccess(responseBody),
+  400: () => handleError(responseBody, contextError = 'Bad Request: Please check all required fields'),
+  401: () => handleError(responseBody, contextError = 'UnAuthorized: Invalid License'),
+  404: () => handleError(responseBody, contextError = 'Not Found: Requested resource could not be found'),
+  500: () => handleError(responseBody, contextError = 'Internal Server Error: Something went wrong on our side')
+};
+
 async function runCodeWarden() {
   try {
     core.info('Code Warden workflow started');
@@ -57,7 +65,9 @@ async function runCodeWarden() {
 
 
   } catch (error) {
-    handleError(null, error.message);
+    core.debug('error status:' + error.response.status);
+    (statuses[error.response.status] ||  handleError(null, error.message))();
+  
   }
 }
 
@@ -65,13 +75,6 @@ function handleResponse(response) {
   const { status, data: responseBody } = response;
   core.debug('response status:' + status);
   core.debug('response body:' + JSON.stringify(response));
-  const statuses = {
-    200: () => handleSuccess(responseBody),
-    400: () => handleError(responseBody, contextError = 'Bad Request: Please check all required fields'),
-    401: () => handleError(responseBody, contextError = 'UnAuthorized: Invalid License'),
-    404: () => handleError(responseBody, contextError = 'Not Found: Requested resource could not be found'),
-    500: () => handleError(responseBody, contextError = 'Internal Server Error: Something went wrong on our side')
-  };
 
   const defaultAction = () => core.setFailed('Unexpected Error: Failed to analyze pull request');
 
