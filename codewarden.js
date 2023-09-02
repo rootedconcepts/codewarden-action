@@ -63,7 +63,8 @@ async function runCodeWarden() {
 
 function handleResponse(response) {
   const { status, data: responseBody } = response;
-
+  core.debug('response status:' + status);
+  core.debug('response body:' + JSON.stringify(response));
   const statuses = {
     200: () => handleSuccess(responseBody),
     400: () => handleError(responseBody, contextError = 'Bad Request: Please check all required fields'),
