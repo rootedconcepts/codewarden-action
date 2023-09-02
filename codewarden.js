@@ -59,7 +59,6 @@ async function runCodeWarden() {
 
   } catch (error) {
     if (error.response) {
-      core.debug('error response:' + JSON.stringify(error.response));
       handleResponse(error.response);
     }
     else{
