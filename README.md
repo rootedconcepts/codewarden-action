@@ -13,7 +13,7 @@ This action will analyze your pull request code using [Code Warden](https://code
 In order to use this action you will require:
 
 1. Jira Data Center edition
-2. The Jira [Code Warden plugin](https://marketplace.atlassian.com/) installed from the Atlassian Marketplace onto your Jira Data Center edition instance
+2. The Jira [Code Warden plugin](https://marketplace.atlassian.com/apps/1231947/code-warden?hosting=datacenter&tab=overview) installed from the Atlassian Marketplace onto your Jira Data Center edition instance
 
 ---
 ## Usage
