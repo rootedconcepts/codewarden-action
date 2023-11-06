@@ -47,6 +47,39 @@ jobs:
           jira-user: ${{ secrets.JIRA_USER }}
           jira-password: ${{ secrets.JIRA_PWD }}
 ```
+## Advanced Usage
+
+```yaml
+
+name: Code Warden In Action
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  pull-requests: write
+ 
+jobs:
+  codewarden-test:
+    runs-on: ubuntu-latest
+   
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Code Warden Analyze
+        uses: rootedconcepts/codewarden-action@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          jira-url : "https://myjiracloud.com/webtrigger"
+          jira-user: ${{ secrets.JIRA_USER }}
+          jira-password: ${{ secrets.JIRA_PWD }}
+          jira-cloud-edition: true
+          comment-language: "French"
+```
 ---
 ## Inputs   
 
@@ -65,6 +98,10 @@ jobs:
 ### `jira-password`
 
 **Required** - The password for the user to login to the Jira instance.
+
+## `jira-cloud-edition`
+
+**Optional** - Specify if you are using Jira Cloud edition. Defaults to false
 
 ### `comment-language`
 
