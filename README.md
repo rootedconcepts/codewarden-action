@@ -89,7 +89,7 @@ jobs:
 
 ### `jira-url`
 
-**Required** - The URL of your Jira instance which has the Code Warden plugin installed. `Note for Jira Cloud edition this generated after you install the Code Warden app and can be retrieved from the Jira UI `
+**Required** - The URL of your Jira instance which has the Code Warden plugin installed. `Note for Jira Cloud edition this will be generated after you install the Code Warden app and can be retrieved from the Jira UI `
 
 ### `jira-user`
 
