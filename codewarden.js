@@ -11,15 +11,21 @@ async function runCodeWarden() {
     const jiraUser = core.getInput('jira-user');
     const jiraPwd = core.getInput('jira-password');
     const commentLanguage = core.getInput('comment-language');
-
-    const codewardenUrl = `${jiraUrl}/rest/analyze/1.0/pr`;
-
+    const jiraCloudEdition = core.getInput('jira-cloud-edition');
+   
+    
     const { context } = github;
     const { eventName, payload } = context;
+
+    let codewardenUrl = `${jiraUrl}/rest/analyze/1.0/pr`;
 
     if (eventName !== "pull_request") {
       core.setFailed('Only pull requests are supported.');
       return;
+    }
+    
+    if(jiraCloudEdition === true || jiraCloudEdition === 'true') {
+      codewardenUrl = `${jiraUrl}`;
     }
 
     const { pull_request: pullRequest } = payload;

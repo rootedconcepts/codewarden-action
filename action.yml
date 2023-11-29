@@ -19,6 +19,10 @@ inputs:
   jira-password:
     description: 'Jira password'
     required: true
+  jira-cloud-edition:
+    description: 'Specify if you are using Jira Cloud edition'
+    required: false
+    default: 'false'
   comment-language:
     description: 'The language you want to Analysis to appear in'
     required: false
